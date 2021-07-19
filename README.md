@@ -1,0 +1,2 @@
+# pytorch_bert_chinese_classification
+基于pytorch+bert的中文文本分类
