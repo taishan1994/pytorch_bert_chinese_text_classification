@@ -1,12 +1,8 @@
 # coding=utf-8
-"""
-该文件暂未被使用
-"""
 import json
 import torch
 import numpy as np
 from torch.utils.data import DataLoader, Dataset
-from utils.utils import sequence_padding
 
 
 class ListDataset(Dataset):
@@ -31,18 +27,34 @@ class ListDataset(Dataset):
 
 
 # 加载数据集
-class MyDataset(ListDataset):
+class CNEWSDataset(ListDataset):
     @staticmethod
     def load_data(filename):
         data = []
         with open(filename, encoding='utf-8') as f:
             raw_data = f.readlines()
             for d in raw_data:
-                d = json.loads(d)
-                text = d['text']
-                label = d['label']
+                d = d.strip().split('\t')
+                text = d[1]
+                label = d[0]
                 data.append((text, label))
         return data
+
+
+class CPWSDataset(ListDataset):
+    @staticmethod
+    def load_data(filename):
+        data = []
+        with open(filename, encoding='utf-8') as f:
+            raw_data = f.readlines()
+            for d in raw_data:
+                d = d.strip()
+                d = d.split("\t")
+                if len(d) == 2:
+                    data.append((d[1], d[0]))
+        return data
+
+
 
 
 class Collate:
@@ -64,17 +76,20 @@ class Collate:
                 padding="max_length",
                 truncation='longest_first',
                 return_token_type_ids=True,
+                return_attention_mask=True
             )
-            token_ids = output["token_type_ids"]
+            token_ids = output["input_ids"]
+            token_type_ids = output["token_type_ids"]
+            attention_mask = output["attention_mask"]
             batch_token_ids.append(token_ids)  # 前面已经限制了长度
-            batch_attention_mask.append([1] * len(token_ids))
-            batch_token_type_ids.append([0] * len(token_ids))
+            batch_attention_mask.append(attention_mask)
+            batch_token_type_ids.append(token_type_ids)
             batch_labels.append(self.tag2id[label])
-        batch_token_ids = torch.tensor(sequence_padding(batch_token_ids, length=self.maxlen), dtype=torch.long,
+        batch_token_ids = torch.tensor(batch_token_ids, dtype=torch.long,
                                        device=self.device)
-        attention_mask = torch.tensor(sequence_padding(batch_attention_mask, length=self.maxlen), dtype=torch.long,
+        attention_mask = torch.tensor(batch_attention_mask, dtype=torch.long,
                                       device=self.device)
-        token_type_ids = torch.tensor(sequence_padding(batch_token_type_ids, length=self.maxlen), dtype=torch.long,
+        token_type_ids = torch.tensor(batch_token_type_ids, dtype=torch.long,
                                       device=self.device)
         batch_labels = torch.tensor(batch_labels, dtype=torch.long, device=self.device)
         batch_data = {
@@ -90,11 +105,11 @@ if __name__ == "__main__":
     from transformers import BertTokenizer
 
     max_len = 512
-    tokenizer = BertTokenizer.from_pretrained('model_hub/voidful-albert-chinese-tiny/vocab.txt')
-    train_dataset = MyDataset(file_path='data/train.json')
+    tokenizer = BertTokenizer.from_pretrained('../model_hub/chinese-bert-wwm-ext')
+    train_dataset = CNEWSDataset(file_path='data/cnews/cnews.train.txt')
     print(train_dataset[0])
 
-    with open('data/labels.txt', 'r', encoding="utf-8") as fp:
+    with open('data/cnews/labels.txt', 'r', encoding="utf-8") as fp:
         labels = fp.read().strip().split("\n")
     id2tag = {}
     tag2id = {}

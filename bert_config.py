@@ -19,6 +19,8 @@ class Args:
                             help='data dir for uer')
         parser.add_argument('--log_dir', default='../logs/',
                             help='log dir for uer')
+        parser.add_argument('--data_name', default='cnews',
+                            help='数据集的名称')
 
         # other args
         parser.add_argument('--num_tags', default=65, type=int,
@@ -60,8 +62,14 @@ class Args:
 
         parser.add_argument('--train_batch_size', default=32, type=int)
 
-        parser.add_argument('--eval_model', default=True, action='store_true',
-                            help='whether to eval model after training')
+        # parser.add_argument('--eval_model', default=True, action='store_true',
+        #                    help='whether to eval model after training')
+        parser.add_argument('--do_train', action='store_true',
+                            help='是否训练')
+        parser.add_argument('--do_test', action='store_true',
+                            help='是否测试')
+        parser.add_argument('--do_predict', action='store_true',
+                            help='是否预测')
 
         return parser
 
