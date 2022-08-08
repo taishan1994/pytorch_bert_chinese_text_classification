@@ -8,16 +8,18 @@ torch==1.6.0
 transformers==4.5.1
 ```
 ## 相关说明
---logs：存放日志<br>
---checkpoints：存放保存的模型<br>
---data：存放数据<br>
---utils：存放辅助函数<br>
---bert_config.py：相关配置<br>
---data_loader.py：制作数据为torch所需的格式<br>
+```
+--logs：存放日志
+--checkpoints：存放保存的模型
+--data：存放数据
+--utils：存放辅助函数
+--bert_config.py：相关配置
+--data_loader.py：制作数据为torch所需的格式
 --models.py：存放模型代码
---main.py：主运行程序，包含训练、验证、测试、预测以及相关评价指标的计算<br>
+--main.py：主运行程序，包含训练、验证、测试、预测以及相关评价指标的计算
+```
 
-在hugging face上预先下载好预训练的bert模型，放在和该项目同级下的model_hub文件夹下，即：<br>
+在hugging face上预先下载好预训练的bert模型，放在和该项目同级下的model_hub文件夹下。
 
 ## 裁判文书分类
 
