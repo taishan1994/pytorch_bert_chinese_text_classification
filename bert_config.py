@@ -70,6 +70,8 @@ class Args:
                             help='是否测试')
         parser.add_argument('--do_predict', action='store_true',
                             help='是否预测')
+        parser.add_argument('--retrain', action='store_true',
+                            help='是否加载模型继续训练')
 
         return parser
 
