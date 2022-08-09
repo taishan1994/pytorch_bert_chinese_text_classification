@@ -223,7 +223,19 @@ def main(args, tokenizer, device):
 
     model = models.BertForSequenceClassification(args)
     optimizer = torch.optim.Adam(params=model.parameters(), lr=args.lr)
+    
+    if args.retrain:
+      checkpoint_path = './checkpoints/{}/best.pt'.format(args.data_name)
+      checkpoint = torch.load(checkpoint_path)
+      model.load_state_dict(checkpoint['state_dict'])
+      optimizer.load_state_dict(checkpoint['optimizer'])
+      
+      epoch = checkpoint['epoch']
+      loss = checkpoint['loss']
+      logger.info("加载模型继续训练，epoch:{} loss:{}".format(epoch, loss))
+    
     trainer = Trainer(args, train_loader, test_loader, test_loader, device, model, optimizer)
+    
     if args.do_train:
       # 训练和验证
       trainer.train()
