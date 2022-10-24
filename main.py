@@ -228,6 +228,7 @@ def main(args, tokenizer, device):
       checkpoint_path = './checkpoints/{}/best.pt'.format(args.data_name)
       checkpoint = torch.load(checkpoint_path)
       model.load_state_dict(checkpoint['state_dict'])
+      model.to(device)
       optimizer.load_state_dict(checkpoint['optimizer'])
       
       epoch = checkpoint['epoch']
