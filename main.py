@@ -17,7 +17,7 @@ from torch.utils.data import DataLoader, RandomSampler
 from transformers import BertTokenizer
 
 import bert_config
-import preprocess
+# import preprocess
 import dataset
 import models
 import utils
@@ -272,7 +272,7 @@ if __name__ == '__main__':
     utils.utils.set_seed(args.seed)
     utils.utils.set_logger(os.path.join(args.log_dir, 'main.log'))
 
-    processor = preprocess.Processor()
+    # processor = preprocess.Processor()
 
     tokenizer = BertTokenizer.from_pretrained(args.bert_dir)
     gpu_ids = args.gpu_ids.split(',')
