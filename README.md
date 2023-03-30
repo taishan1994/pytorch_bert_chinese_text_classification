@@ -96,7 +96,7 @@ weighted avg       0.98      0.98      0.98      9991
 ```python
 python main.py \
 --bert_dir="../model_hub/chinese-bert-wwm-ext/" \
---data_dir="./data/cpws/" \
+--data_dir="./data/cnews/" \
 --data_name="cpws" \
 --log_dir="./logs/" \
 --output_dir="./checkpoints/" \
