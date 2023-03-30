@@ -18,7 +18,7 @@ from transformers import BertTokenizer
 
 import bert_config
 # import preprocess
-import dataset
+# import dataset
 import models
 import utils
 from data_loader import CNEWSDataset, Collate, CPWSDataset
