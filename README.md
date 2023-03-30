@@ -46,7 +46,6 @@ python main.py \
 --gpu_ids="0" \
 --max_seq_len=256 \
 --lr=3e-5 \
---other_lr=3e-4 \
 --train_batch_size=16 \
 --train_epochs=5 \
 --eval_batch_size=16 \
@@ -105,7 +104,6 @@ python main.py \
 --gpu_ids="0" \
 --max_seq_len=512 \
 --lr=3e-5 \
---other_lr=3e-4 \
 --train_batch_size=16 \
 --train_epochs=5 \
 --eval_batch_size=16 \
