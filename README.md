@@ -140,6 +140,27 @@ weighted avg       0.97      0.97      0.97     10000
 ==========================
 ```
 
+# Dataparallel分布式训练
+
+```python
+python main_dataparallel.py \
+--bert_dir="../model_hub/chinese-bert-wwm-ext/" \
+--data_dir="./data/cnews/" \
+--data_name="cnews" \
+--log_dir="./logs/" \
+--output_dir="./checkpoints/" \
+--num_tags=10 --seed=123 \
+--gpu_ids="0,1,3" \
+--max_seq_len=512 \
+--lr=3e-5 \
+--train_batch_size=64 \
+--train_epochs=1 \
+--eval_batch_size=64 \
+--do_train \
+--do_predict \
+--do_test
+```
+
 # 补充
 
 Q：怎么训练自己的数据集？<br>
@@ -151,5 +172,5 @@ A：按照样例的一般步骤里面进行即可。<br>
 - 2022-08-08：重构了代码，使得总体结构更加简单，更易于用于不同的数据集上。
 - 2022-08-09：新增是否加载模型继续训练，运行参数加上--retrain。
 
-
+- 2023-03-30：新增基于dataparallel的分布式训练。
 

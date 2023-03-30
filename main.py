@@ -1,3 +1,6 @@
+import sys
+
+sys.path.append(r"./")
 """
 该文件使用的data_loader.py里面的数据加载方式。
 """
@@ -17,10 +20,8 @@ from torch.utils.data import DataLoader, RandomSampler
 from transformers import BertTokenizer
 
 import bert_config
-# import preprocess
-# import dataset
 import models
-import utils
+from utils import utils
 from data_loader import CNEWSDataset, Collate, CPWSDataset
 
 logger = logging.getLogger(__name__)
@@ -51,9 +52,8 @@ class Trainer:
         model.load_state_dict(checkpoint['state_dict'])
         return model
 
-
     def save_ckp(self, state, checkpoint_path):
-      torch.save(state, checkpoint_path)
+        torch.save(state, checkpoint_path)
 
     """
     def save_ckp(self, state, is_best, checkpoint_path, best_model_path):
@@ -101,7 +101,7 @@ class Trainer:
                         best_dev_micro_f1 = macro_f1
                         save_path = os.path.join(self.args.output_dir, args.data_name)
                         if not os.path.exists(save_path):
-                          os.makedirs(save_path)
+                            os.makedirs(save_path)
                         checkpoint_path = os.path.join(save_path, 'best.pt')
                         self.save_ckp(checkpoint, checkpoint_path)
 
@@ -181,19 +181,20 @@ class Trainer:
         report = classification_report(targets, outputs, target_names=labels)
         return report
 
+
 datasets = {
-  "cnews": CNEWSDataset,
-  "cpws": CPWSDataset
+    "cnews": CNEWSDataset,
+    "cpws": CPWSDataset
 }
 
 train_files = {
-  "cnews": "cnews.train.txt",
-  "cpws": "train_data.txt"
+    "cnews": "cnews.train.txt",
+    "cpws": "train_data.txt"
 }
 
 test_files = {
-  "cnews": "cnews.test.txt",
-  "cpws": "test_data.txt"
+    "cnews": "cnews.test.txt",
+    "cpws": "test_data.txt"
 }
 
 
@@ -201,7 +202,7 @@ def main(args, tokenizer, device):
     dataset = datasets.get(args.data_name, None)
     train_file, test_file = train_files.get(args.data_name, None), test_files.get(args.data_name, None)
     if dataset is None:
-      raise Exception("请输入正确的数据集名称")
+        raise Exception("请输入正确的数据集名称")
     label2id = {}
     id2label = {}
     with open('./data/{}/labels.txt'.format(args.data_name), 'r', encoding="utf-8") as fp:
@@ -211,66 +212,65 @@ def main(args, tokenizer, device):
         id2label[i] = label
     print(label2id)
 
-
-    collate = Collate(tokenizer=tokenizer, max_len=args.max_seq_len, tag2id=label2id, device=device)
+    collate = Collate(tokenizer=tokenizer, max_len=args.max_seq_len, tag2id=label2id)
 
     train_dataset = dataset(file_path='data/{}/{}'.format(args.data_name, train_file))
     train_loader = DataLoader(train_dataset, batch_size=args.train_batch_size, shuffle=True,
                               collate_fn=collate.collate_fn)
     test_dataset = dataset(file_path='data/{}/{}'.format(args.data_name, test_file))
     test_loader = DataLoader(test_dataset, batch_size=args.eval_batch_size, shuffle=False,
-                            collate_fn=collate.collate_fn)
+                             collate_fn=collate.collate_fn)
 
     model = models.BertForSequenceClassification(args)
     optimizer = torch.optim.Adam(params=model.parameters(), lr=args.lr)
-    
+
     if args.retrain:
-      checkpoint_path = './checkpoints/{}/best.pt'.format(args.data_name)
-      checkpoint = torch.load(checkpoint_path)
-      model.load_state_dict(checkpoint['state_dict'])
-      model.to(device)
-      optimizer.load_state_dict(checkpoint['optimizer'])
-      
-      epoch = checkpoint['epoch']
-      loss = checkpoint['loss']
-      logger.info("加载模型继续训练，epoch:{} loss:{}".format(epoch, loss))
-    
+        checkpoint_path = './checkpoints/{}/best.pt'.format(args.data_name)
+        checkpoint = torch.load(checkpoint_path)
+        model.load_state_dict(checkpoint['state_dict'])
+        model.to(device)
+        optimizer.load_state_dict(checkpoint['optimizer'])
+
+        epoch = checkpoint['epoch']
+        loss = checkpoint['loss']
+        logger.info("加载模型继续训练，epoch:{} loss:{}".format(epoch, loss))
+
     trainer = Trainer(args, train_loader, test_loader, test_loader, device, model, optimizer)
-    
+
     if args.do_train:
-      # 训练和验证
-      trainer.train()
+        # 训练和验证
+        trainer.train()
 
     # 测试
     if args.do_test:
-      logger.info('========进行测试========')
-      checkpoint_path = './checkpoints/{}/best.pt'.format(args.data_name)
-      model = trainer.load_model(model, checkpoint_path)
-      total_loss, test_outputs, test_targets = trainer.test(model)
-      accuracy, micro_f1, macro_f1 = trainer.get_metrics(test_outputs, test_targets)
-      logger.info(
-          "【test】 loss：{:.6f} accuracy：{:.4f} micro_f1：{:.4f} macro_f1：{:.4f}".format(total_loss, accuracy, micro_f1,
-                                                                                      macro_f1))
-      report = trainer.get_classification_report(test_outputs, test_targets, labels)
-      logger.info(report)
+        logger.info('========进行测试========')
+        checkpoint_path = './checkpoints/{}/best.pt'.format(args.data_name)
+        model = trainer.load_model(model, checkpoint_path)
+        total_loss, test_outputs, test_targets = trainer.test(model)
+        accuracy, micro_f1, macro_f1 = trainer.get_metrics(test_outputs, test_targets)
+        logger.info(
+            "【test】 loss：{:.6f} accuracy：{:.4f} micro_f1：{:.4f} macro_f1：{:.4f}".format(total_loss, accuracy, micro_f1,
+                                                                                        macro_f1))
+        report = trainer.get_classification_report(test_outputs, test_targets, labels)
+        logger.info(report)
 
     # 预测
     if args.do_predict:
-      checkpoint_path = './checkpoints/{}/best.pt'.format(args.data_name)
-      model = trainer.load_model(model, checkpoint_path)
-      line = test_dataset[0]
-      text = line[0]
-      print(text)
-      result = trainer.predict(tokenizer, text, id2label, args, model)
-      print("预测标签：", result[0])
-      print("真实标签：", line[1])
-      print("==========================")
+        checkpoint_path = './checkpoints/{}/best.pt'.format(args.data_name)
+        model = trainer.load_model(model, checkpoint_path)
+        line = test_dataset[0]
+        text = line[0]
+        print(text)
+        result = trainer.predict(tokenizer, text, id2label, args, model)
+        print("预测标签：", result[0])
+        print("真实标签：", line[1])
+        print("==========================")
 
 
 if __name__ == '__main__':
     args = bert_config.Args().get_parser()
-    utils.utils.set_seed(args.seed)
-    utils.utils.set_logger(os.path.join(args.log_dir, 'main.log'))
+    utils.set_seed(args.seed)
+    utils.set_logger(os.path.join(args.log_dir, 'main.log'))
 
     # processor = preprocess.Processor()
 
@@ -279,4 +279,3 @@ if __name__ == '__main__':
     device = torch.device("cpu" if gpu_ids[0] == '-1' else "cuda:" + gpu_ids[0])
 
     main(args, tokenizer, device)
-

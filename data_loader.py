@@ -58,11 +58,10 @@ class CPWSDataset(ListDataset):
 
 
 class Collate:
-    def __init__(self, tokenizer, max_len, tag2id, device):
+    def __init__(self, tokenizer, max_len, tag2id):
         self.tokenizer = tokenizer
         self.maxlen = max_len
         self.tag2id = tag2id
-        self.device = device
 
     def collate_fn(self, batch):
         batch_labels = []
@@ -85,13 +84,10 @@ class Collate:
             batch_attention_mask.append(attention_mask)
             batch_token_type_ids.append(token_type_ids)
             batch_labels.append(self.tag2id[label])
-        batch_token_ids = torch.tensor(batch_token_ids, dtype=torch.long,
-                                       device=self.device)
-        attention_mask = torch.tensor(batch_attention_mask, dtype=torch.long,
-                                      device=self.device)
-        token_type_ids = torch.tensor(batch_token_type_ids, dtype=torch.long,
-                                      device=self.device)
-        batch_labels = torch.tensor(batch_labels, dtype=torch.long, device=self.device)
+        batch_token_ids = torch.tensor(batch_token_ids, dtype=torch.long)
+        attention_mask = torch.tensor(batch_attention_mask, dtype=torch.long)
+        token_type_ids = torch.tensor(batch_token_type_ids, dtype=torch.long)
+        batch_labels = torch.tensor(batch_labels, dtype=torch.long)
         batch_data = {
             "token_ids":batch_token_ids,
             "attention_masks":attention_mask,
