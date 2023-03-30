@@ -149,7 +149,8 @@ python main_dataparallel.py \
 --data_name="cnews" \
 --log_dir="./logs/" \
 --output_dir="./checkpoints/" \
---num_tags=10 --seed=123 \
+--num_tags=10 \
+--seed=123 \
 --gpu_ids="0,1,3" \
 --max_seq_len=512 \
 --lr=3e-5 \
