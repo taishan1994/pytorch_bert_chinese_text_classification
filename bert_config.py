@@ -38,6 +38,10 @@ class Args:
                             help='the epoch when swa start')
 
         # train args
+        # This is passed in via launch.py
+        parser.add_argument("--local_rank", type=int, default=0)
+        # This needs to be explicitly passed in
+        parser.add_argument("--local_world_size", type=int, default=1)
         parser.add_argument('--train_epochs', default=15, type=int,
                             help='Max training epoch')
 

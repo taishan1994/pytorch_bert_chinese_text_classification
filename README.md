@@ -162,6 +162,26 @@ python main_dataparallel.py \
 --do_test
 ```
 
+# Distributed单机多卡分布式训练（windows下）
+
+linux下没有测试过。运行需要在powershell里面运行，右键点击开始菜单，选择powershell。nvidia.bat用于监控运行之后GPU的使用情况。
+
+### 使用torch.distributed.launch启动
+
+```python
+python -m torch.distributed.launch --nnode=1 --node_rank=0 --nproc_per_node=4 main_distributed.py --local_world_size=4 --bert_dir="../model_hub/chinese-bert-wwm-ext/" --data_dir="./data/cnews/" --data_name="cnews" --log_dir="./logs/" --output_dir="./checkpoints/" --num_tags=10 --seed=123 --max_seq_len=512 --lr=3e-5 --train_batch_size=64 --train_epochs=1 --eval_batch_size=64 --do_train --do_predict --do_test
+```
+
+**说明**：文件里面通过```os.environ["CUDA_VISIBLE_DEVICES"] = '0,1,3'```来选择使用的GPU。nproc_per_node为使用的GPU的数目，local_world_size为使用的GPU的数目。
+
+### 使用torch.multiprocessing启动
+
+```python
+python main_mp_distributed.py --local_world_size=4 --bert_dir="../model_hub/chinese-bert-wwm-ext/" --data_dir="./data/cnews/" --data_name="cnews" --log_dir="./logs/" --output_dir="./checkpoints/" --num_tags=10 --seed=123 --max_seq_len=512 --lr=3e-5 --train_batch_size=64 --train_epochs=1 --eval_batch_size=64 --do_train --do_predict --do_test
+```
+
+**说明**：文件里面通过```os.environ["CUDA_VISIBLE_DEVICES"] = '0,1,3'```来选择使用的GPU。local_world_size为使用的GPU的数目。
+
 # 补充
 
 Q：怎么训练自己的数据集？<br>
@@ -174,4 +194,6 @@ A：按照样例的一般步骤里面进行即可。<br>
 - 2022-08-09：新增是否加载模型继续训练，运行参数加上--retrain。
 
 - 2023-03-30：新增基于dataparallel的分布式训练。
+
+- 2023-04-02：新增基于distributed的分布式训练。
 
