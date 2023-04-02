@@ -164,7 +164,7 @@ python main_dataparallel.py \
 
 # Distributed单机多卡分布式训练（windows下）
 
-linux下没有测试过。运行需要在powershell里面运行，右键点击开始菜单，选择powershell。nvidia.bat用于监控运行之后GPU的使用情况。
+linux下没有测试过。运行需要在powershell里面运行，右键点击开始菜单，选择powershell。nvidia.bat用于监控运行之后GPU的使用情况。需要pytorch版本至少大于1.7，这里使用的是pytorch==1.12。
 
 ### 使用torch.distributed.launch启动
 
